@@ -3,12 +3,6 @@ function processCurrentCartola_FROM_FOLDER() {
   const cartolaSheet = ss.getSheetByName('Cartolas');
   if (!cartolaSheet) throw new Error('No existe la hoja "Cartolas" en el spreadsheet maestro.');
 
-  // Limpiar desde fila 2
-  const lastRow = cartolaSheet.getLastRow();
-  if (lastRow > 1) {
-    cartolaSheet.getRange(2, 1, lastRow - 1, cartolaSheet.getLastColumn()).clearContent();
-  }
-
   // 1) Buscar el Excel de cartola más reciente en la carpeta
   const excel = findLatestFileByPattern_(
     CONFIG.INPUT_FOLDER_ID,
@@ -63,8 +57,29 @@ function processCurrentCartola_FROM_FOLDER() {
     out.push([formattedDate, month, description, channel, charges, credits, balance, classification, year]);
   }
 
-  if (out.length > 0) {
-    cartolaSheet.getRange(2, 1, out.length, out[0].length).setValues(out);
+  const existingLastRow = cartolaSheet.getLastRow();
+  let existingData = [];
+
+  if (existingLastRow > 1) {
+    existingData = cartolaSheet
+      .getRange(2, 1, existingLastRow - 1, cartolaSheet.getLastColumn())
+      .getValues();
+  }
+
+  const filteredData = existingData.filter(row => {
+    const rowMonth = String(row[1] || '').padStart(2, '0');
+    const rowYear = String(row[8] || '');
+    return !(rowMonth === currentMonth && rowYear === currentYear);
+  });
+
+  const combinedData = filteredData.concat(out);
+
+  if (existingLastRow > 1) {
+    cartolaSheet.getRange(2, 1, existingLastRow - 1, cartolaSheet.getLastColumn()).clearContent();
+  }
+
+  if (combinedData.length > 0) {
+    cartolaSheet.getRange(2, 1, combinedData.length, combinedData[0].length).setValues(combinedData);
   }
 
   Logger.log(`✅ Cartola actual procesada. Filas pegadas: ${out.length}`);

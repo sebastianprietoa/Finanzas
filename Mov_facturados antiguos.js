@@ -11,12 +11,10 @@ function processAllOldInvoices() {
 
   try {
     // ID de la carpeta que contiene los archivos de facturación antiguos
-    const folderId = '1q6xnHnAt6vngYFGo-IngB1hMx43t4cEm';
-    const folder = DriveApp.getFolderById(folderId);
+    const folder = DriveApp.getFolderById(CONFIG.OLD_INVOICES_FOLDER_ID);
 
     // ID del archivo de Google Sheets "Finanzas 2"
-    const sheetId = '1mH2RX-Tr1dohooJOsy2cxtN7BpP0AvDq0pt8jkBD0OQ';
-    const sheet = SpreadsheetApp.openById(sheetId);
+    const sheet = SpreadsheetApp.openById(CONFIG.MASTER_SHEET_ID);
     const movFacturadosSheet = sheet.getSheetByName('Mov_facturados_historicos');
 
     // Borrar todo el contenido desde la fila 2 en adelante en la hoja "Mov_facturados_historicos"
