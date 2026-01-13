@@ -1,12 +1,10 @@
 function extractAndCopyCartolasFromGoogleSheets() {
   // ID de la carpeta que contiene los archivos convertidos a Google Sheets
-  const folderId = '16E_RvO6E9IYqBKbo3ZwUOvh802UR8Xw5';
-  const folder = DriveApp.getFolderById(folderId);
-  convertExcelToGoogleSheets(folderId)
+  const folder = DriveApp.getFolderById(CONFIG.OLD_CARTOLAS_FOLDER_ID);
+  convertExcelToGoogleSheets(CONFIG.OLD_CARTOLAS_FOLDER_ID)
 
   // ID del archivo de Google Sheets "Finanzas 2"
-  const sheetId = '1mH2RX-Tr1dohooJOsy2cxtN7BpP0AvDq0pt8jkBD0OQ';
-  const sheet = SpreadsheetApp.openById(sheetId);
+  const sheet = SpreadsheetApp.openById(CONFIG.MASTER_SHEET_ID);
   const cartolasSheet = sheet.getSheetByName('Cartolas');
 
   // Borrar todo el contenido desde la fila 2 en adelante
