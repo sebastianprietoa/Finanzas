@@ -7,8 +7,7 @@ function extraerCuotasFuturasMastercard() {
 }
 
 function extraerCuotasFuturasDesdeHoja(nombreHojaOrigen, nombreHojaDestino) {
-  const sheetId = '1mH2RX-Tr1dohooJOsy2cxtN7BpP0AvDq0pt8jkBD0OQ';
-  const ss = SpreadsheetApp.openById(sheetId);
+  const ss = SpreadsheetApp.openById(CONFIG.MASTER_SHEET_ID);
   const hojaOrigen = ss.getSheetByName(nombreHojaOrigen);
   const sheetCuotas = ss.getSheetByName(nombreHojaDestino);
 

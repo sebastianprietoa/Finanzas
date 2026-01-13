@@ -8,11 +8,9 @@ function processNoFacturadosMastercard() {
   ui.showModalDialog(htmlOutput, 'Por favor espere');
 
   try {
-    const folderId = '1hZ5xqEwUdE-7kurotgiXmH-ylVQvE8HQ';
-    const folder = DriveApp.getFolderById(folderId);
-    const fileName = 'Saldo_y_Mov_No_Facturado_Mastercard';
-    const sheetId = '1mH2RX-Tr1dohooJOsy2cxtN7BpP0AvDq0pt8jkBD0OQ';
-    const sheet = SpreadsheetApp.openById(sheetId);
+    const folder = DriveApp.getFolderById(CONFIG.UNBILLED_MOVEMENTS_FOLDER_ID);
+    const fileName = CONFIG.UNBILLED_MOVEMENTS_MASTERCARD_FILE_NAME;
+    const sheet = SpreadsheetApp.openById(CONFIG.MASTER_SHEET_ID);
     const movNoFacturadosSheet = sheet.getSheetByName('Mov_No_facturados_Mastercard');
 
     // Limpiar hoja destino
@@ -86,4 +84,3 @@ function processNoFacturadosMastercard() {
     SpreadsheetApp.getUi().showModalDialog(closeDialogOutput, 'Cerrando');
   }
 }
-

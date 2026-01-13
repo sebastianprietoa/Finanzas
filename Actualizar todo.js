@@ -1,26 +1,29 @@
 function runAllProcesses() {
-  const ui = SpreadsheetApp.getUi();
+  const ui = getUiOrNull_();
 
   try {
     const folderId = getFolderIdByFileName("Finanzas 2");  // Obtener el folderId usando la nueva función
 
     if (!folderId) {
-      ui.alert('No se encontró la carpeta que contiene el archivo "Finanzas 2".');
+      if (ui) ui.alert('No se encontró la carpeta que contiene el archivo "Finanzas 2".');
+      Logger.log('No se encontró la carpeta que contiene el archivo "Finanzas 2".');
       return;
     }
 
     // Mostrar un mensaje de "Cargando" al usuario utilizando el archivo HTML
-    const htmlOutput = HtmlService.createHtmlOutputFromFile('Cargando')
-      .setWidth(200)
-      .setHeight(100);
-    
-    // Mostrar la ventana de "Cargando"
-    const dialog = ui.showModalDialog(htmlOutput, 'Por favor espere');
+    if (ui) {
+      const htmlOutput = HtmlService.createHtmlOutputFromFile('Cargando')
+        .setWidth(200)
+        .setHeight(100);
+      
+      // Mostrar la ventana de "Cargando"
+      ui.showModalDialog(htmlOutput, 'Por favor espere');
+    }
     
     // Ejecutar las funciones necesarias
     convertExcelToGoogleSheets(folderId);
+    extractAndCopyCartolasFromGoogleSheets();
     processCurrentCartola_FROM_FOLDER();      // Procesar cartola actual
-    extractAndCopyCartolasFromGoogleSheets()
     processMovFacturadosVisa();
     processMovFacturadosMastercard();       // Procesar movimientos facturados
     processNoFacturadosVisa();        // Procesar movimientos no facturados Visa
@@ -28,13 +31,15 @@ function runAllProcesses() {
     processAllOldInvoices();      // Procesar facturaciones antiguas
 
     // Mostrar mensaje de éxito cuando termine la ejecución
-    ui.alert('Procesos completados con éxito.');
+    if (ui) ui.alert('Procesos completados con éxito.');
+    Logger.log('Procesos completados con éxito.');
   } catch (e) {
     // Si ocurre un error, mostrar una alerta con el mensaje de error
-    ui.alert('Error durante la ejecución: ' + e.message);
+    if (ui) ui.alert('Error durante la ejecución: ' + e.message);
+    Logger.log('Error durante la ejecución: ' + e.message);
   } finally {
     // Cerrar la ventana de "Cargando" al finalizar la ejecución
-    closeLoadingDialog();
+    closeLoadingDialog(ui);
   }
 }
 
@@ -68,21 +73,28 @@ function getSheetIdByName(sheetName) {
 }
 
 
-function closeLoadingDialog() {
+function closeLoadingDialog(ui) {
+  if (!ui) return;
   const closeDialogScript = '<script>google.script.host.close();</script>';
   const closeDialogOutput = HtmlService.createHtmlOutput(closeDialogScript);
-  SpreadsheetApp.getUi().showModalDialog(closeDialogOutput, 'Cerrando');
+  ui.showModalDialog(closeDialogOutput, 'Cerrando');
 }
 
+function getUiOrNull_() {
+  try {
+    return SpreadsheetApp.getUi();
+  } catch (e) {
+    return null;
+  }
+}
 
 
 function extractUniqueDescriptions() {
   // ID de la carpeta que contiene el archivo "Saldo_y_Mov_No_Facturado"
-  const folderId = '1hZ5xqEwUdE-7kurotgiXmH-ylVQvE8HQ';
-  const folder = DriveApp.getFolderById(folderId);
+  const folder = DriveApp.getFolderById(CONFIG.UNBILLED_MOVEMENTS_FOLDER_ID);
 
   // Nombre del archivo de los movimientos no facturados
-  const fileName = 'Saldo_y_Mov_No_Facturado';
+  const fileName = CONFIG.UNBILLED_MOVEMENTS_FILE_NAME;
 
   // Obtener el archivo de los movimientos no facturados
   const files = folder.getFilesByName(fileName);
@@ -116,8 +128,7 @@ function extractUniqueDescriptions() {
 
 function simpleConvertXLStoXLSX() {
   // ID de la carpeta que contiene los archivos .xls
-  const folderId = '1q6xnHnAt6vngYFGo-IngB1hMx43t4cEm';
-  const folder = DriveApp.getFolderById(folderId);
+  const folder = DriveApp.getFolderById(CONFIG.XLS_CONVERSION_FOLDER_ID);
 
   const files = folder.getFilesByType(MimeType.MICROSOFT_EXCEL);
   
@@ -153,8 +164,7 @@ function simpleConvertXLStoXLSX() {
 
 function reclassifyDescriptions() {
   // ID del archivo de Google Sheets "Finanzas 2"
-  const sheetId = '1mH2RX-Tr1dohooJOsy2cxtN7BpP0AvDq0pt8jkBD0OQ';
-  const sheet = SpreadsheetApp.openById(sheetId);
+  const sheet = SpreadsheetApp.openById(CONFIG.MASTER_SHEET_ID);
   const movFacturadosSheet = sheet.getSheetByName('mov_facturados_historicos');
 
   // Obtener el rango de descripciones y categorías actuales
