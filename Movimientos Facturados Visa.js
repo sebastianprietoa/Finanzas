@@ -1,14 +1,12 @@
 function processMovFacturadosVisa() {
   // ID de la carpeta que contiene el archivo "Mov_Facturados"
-  const folderId = '1hZ5xqEwUdE-7kurotgiXmH-ylVQvE8HQ';
-  const folder = DriveApp.getFolderById(folderId);
+  const folder = DriveApp.getFolderById(CONFIG.UNBILLED_MOVEMENTS_FOLDER_ID);
 
   // Nombre del archivo de los movimientos facturados
-  const fileName = 'Mov_Facturado_Visa';
+  const fileName = CONFIG.BILLED_MOVEMENTS_VISA_FILE_NAME;
 
   // ID del archivo de Google Sheets "Finanzas 2"
-  const sheetId = '1mH2RX-Tr1dohooJOsy2cxtN7BpP0AvDq0pt8jkBD0OQ';
-  const sheet = SpreadsheetApp.openById(sheetId);
+  const sheet = SpreadsheetApp.openById(CONFIG.MASTER_SHEET_ID);
   const movFacturadosSheet = sheet.getSheetByName('Mov_facturados_Visa');
 
   // Borrar todo el contenido desde la fila 2 en adelante en la hoja "Mov_facturados"
@@ -134,4 +132,3 @@ function classifyDescription(description) {
   }
   return "Otros"; // Clasificación por defecto si no encaja en ninguna otra
 }
-
