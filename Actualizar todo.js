@@ -19,8 +19,8 @@ function runAllProcesses() {
     
     // Ejecutar las funciones necesarias
     convertExcelToGoogleSheets(folderId);
+    extractAndCopyCartolasFromGoogleSheets();
     processCurrentCartola_FROM_FOLDER();      // Procesar cartola actual
-    extractAndCopyCartolasFromGoogleSheets()
     processMovFacturadosVisa();
     processMovFacturadosMastercard();       // Procesar movimientos facturados
     processNoFacturadosVisa();        // Procesar movimientos no facturados Visa
@@ -78,11 +78,10 @@ function closeLoadingDialog() {
 
 function extractUniqueDescriptions() {
   // ID de la carpeta que contiene el archivo "Saldo_y_Mov_No_Facturado"
-  const folderId = '1hZ5xqEwUdE-7kurotgiXmH-ylVQvE8HQ';
-  const folder = DriveApp.getFolderById(folderId);
+  const folder = DriveApp.getFolderById(CONFIG.UNBILLED_MOVEMENTS_FOLDER_ID);
 
   // Nombre del archivo de los movimientos no facturados
-  const fileName = 'Saldo_y_Mov_No_Facturado';
+  const fileName = CONFIG.UNBILLED_MOVEMENTS_FILE_NAME;
 
   // Obtener el archivo de los movimientos no facturados
   const files = folder.getFilesByName(fileName);
@@ -116,8 +115,7 @@ function extractUniqueDescriptions() {
 
 function simpleConvertXLStoXLSX() {
   // ID de la carpeta que contiene los archivos .xls
-  const folderId = '1q6xnHnAt6vngYFGo-IngB1hMx43t4cEm';
-  const folder = DriveApp.getFolderById(folderId);
+  const folder = DriveApp.getFolderById(CONFIG.XLS_CONVERSION_FOLDER_ID);
 
   const files = folder.getFilesByType(MimeType.MICROSOFT_EXCEL);
   
@@ -153,8 +151,7 @@ function simpleConvertXLStoXLSX() {
 
 function reclassifyDescriptions() {
   // ID del archivo de Google Sheets "Finanzas 2"
-  const sheetId = '1mH2RX-Tr1dohooJOsy2cxtN7BpP0AvDq0pt8jkBD0OQ';
-  const sheet = SpreadsheetApp.openById(sheetId);
+  const sheet = SpreadsheetApp.openById(CONFIG.MASTER_SHEET_ID);
   const movFacturadosSheet = sheet.getSheetByName('mov_facturados_historicos');
 
   // Obtener el rango de descripciones y categorías actuales

@@ -12,8 +12,12 @@ function classifyCC_(descriptionLower) {
   if (descriptionLower.includes("pago:comunidad feliz")) return "Gastos Comunes";
   if (descriptionLower.includes("pago tarjeta de credito")) return "Pago TC";
   if (descriptionLower.includes("cargo por pago tc")) return "Pago TC";
+  if (descriptionLower.includes("pago prestamo")) return "Pago préstamo";
   if (descriptionLower.includes("pago:")) return "Pago";
+  if (descriptionLower.includes("abono por recaudacion servicios")) return "Abono servicios";
+  if (descriptionLower.includes("abonos por creditos m/n")) return "Abono créditos";
   if (descriptionLower.includes("comision admin. mensual plan cuent")) return "Comisión";
+  if (descriptionLower.includes("comision compras en el exterior")) return "Comisión exterior";
   if (descriptionLower.includes("intereses linea de credito")) return "Intereses LC";
   if (descriptionLower.includes("impuesto linea de credito")) return "Intereses LC";
   if (descriptionLower.includes("prima seguro desgravamen")) return "Seguro";
@@ -22,6 +26,5 @@ function classifyCC_(descriptionLower) {
   if (descriptionLower.includes("pago en servipag.com")) return "Cuentas";
   if (descriptionLower.includes("regularizacion de seguro")) return "Regularización de seguro";
   if (descriptionLower.includes("saldo")) return "Saldo";
-  return "";
+  return "Otros";
 }
-

@@ -1,12 +1,10 @@
 function extractAndCopyCartolasFromGoogleSheets() {
   // ID de la carpeta que contiene los archivos convertidos a Google Sheets
-  const folderId = '16E_RvO6E9IYqBKbo3ZwUOvh802UR8Xw5';
-  const folder = DriveApp.getFolderById(folderId);
-  convertExcelToGoogleSheets(folderId)
+  const folder = DriveApp.getFolderById(CONFIG.OLD_CARTOLAS_FOLDER_ID);
+  convertExcelToGoogleSheets(CONFIG.OLD_CARTOLAS_FOLDER_ID)
 
   // ID del archivo de Google Sheets "Finanzas 2"
-  const sheetId = '1mH2RX-Tr1dohooJOsy2cxtN7BpP0AvDq0pt8jkBD0OQ';
-  const sheet = SpreadsheetApp.openById(sheetId);
+  const sheet = SpreadsheetApp.openById(CONFIG.MASTER_SHEET_ID);
   const cartolasSheet = sheet.getSheetByName('Cartolas');
 
   // Borrar todo el contenido desde la fila 2 en adelante
@@ -71,48 +69,7 @@ function extractAndCopyCartolasFromGoogleSheets() {
       const balance = values[i][5] ? parseFloat(String(values[i][5]).replace(/\./g, '').replace(',', '.')) : 0;
       
       // Clasificación basada en la descripción
-      let classification = "";
-      if (description.includes("TRASPASO A:gonzalo sanchez escoba")) {
-        classification = "Arriendo";
-      } else if (description.includes("TRASPASO A:Fintual Administradora")) {
-        classification = "Fintech";
-      } else if (description.includes("TRASPASO A:Soyfocus Administradora")) {
-        classification = "Fintech";
-      } else if (description.includes("TRASPASO A")) {
-        classification = "Transferencia out";
-      } else if (description.includes("TRASPASO DE:PROMOTORA Y GESTORA ME")) {
-        classification = "Sueldo";
-      } else if (description.includes("TRASPASO DE")) {
-        classification = "Transferencia in";
-      } else if (description.includes("GIRO CAJERO AUTOMATICO")) {
-        classification = "Giro";
-      } else if (description.includes("PAGO:COMUNIDAD FELIZ")) {
-        classification = "Gastos Comunes";
-      } else if (description.includes("PAGO TARJETA DE CREDITO")) {
-        classification = "Pago TC";
-      } else if (description.includes("PAGO:")) {
-        classification = "Pago";
-      } else if (description.includes("COMISION ADMIN. MENSUAL PLAN CUENT")) {
-        classification = "Comisión";
-      } else if (description.includes("CARGO POR PAGO TC")) {
-        classification = "Pago TC";
-      } else if (description.includes("INTERESES LINEA DE CREDITO")) {
-        classification = "Intereses LC";
-      } else if (description.includes("SALDO")) {
-        classification = "Saldo";
-      } else if (description.includes("PAGO EN SERVIPAG.COM")) {
-        classification = "Cuentas";
-      } else if (description.includes("Regularizacion De Seguro")) {
-        classification = "Regularización de seguro";
-      } else if (description.includes("IMPUESTO LINEA DE CREDITO")) {
-        classification = "Intereses LC";
-      }  else if (description.includes("PRIMA SEGURO DESGRAVAMEN")) {
-        classification = "Seguro";
-      } else if (description.includes("TRANSFERENCIA DESDE LINEA DE CREDI")) {
-        classification = "Pago LC in";
-      } else if (description.includes("PAGO LINEA DE CRED")) {
-        classification = "Pago LC out";
-      }
+      const classification = classifyCC_(description.toLowerCase());
 
       
 

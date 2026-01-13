@@ -1,9 +1,7 @@
 function processMovFacturadosMastercard() {
-  const folderId = '1hZ5xqEwUdE-7kurotgiXmH-ylVQvE8HQ';
-  const folder = DriveApp.getFolderById(folderId);
-  const fileName = 'Mov_Facturado_Mastercard';
-  const sheetId = '1mH2RX-Tr1dohooJOsy2cxtN7BpP0AvDq0pt8jkBD0OQ';
-  const sheet = SpreadsheetApp.openById(sheetId);
+  const folder = DriveApp.getFolderById(CONFIG.UNBILLED_MOVEMENTS_FOLDER_ID);
+  const fileName = CONFIG.BILLED_MOVEMENTS_MASTERCARD_FILE_NAME;
+  const sheet = SpreadsheetApp.openById(CONFIG.MASTER_SHEET_ID);
   const movFacturadosSheet = sheet.getSheetByName('Mov_facturados_Mastercard');
 
   // Limpiar hoja desde la fila 2
@@ -123,4 +121,3 @@ function classifyDescription(description) {
   }
   return "Otros"; // Clasificación por defecto si no encaja en ninguna otra
 }
-
