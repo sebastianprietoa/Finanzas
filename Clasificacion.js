@@ -1,0 +1,27 @@
+function classifyCC_(descriptionLower) {
+  if (descriptionLower.includes("traspaso a:gonzalo sanchez escoba")) return "Arriendo";
+  if (descriptionLower.includes("traspaso a:fintual administradora")) return "Fintech";
+  if (descriptionLower.includes("traspaso a:soyfocus administradora")) return "Fintech";
+  if (descriptionLower.includes("traspaso a:orionx")) return "Fintech";
+  if (descriptionLower.includes("traspaso a:racional")) return "Fintech";
+  if (descriptionLower.includes("traspaso a")) return "Transferencia out";
+  if (descriptionLower.includes("traspaso de:promotora y gestora me")) return "Sueldo";
+  if (descriptionLower.includes("traspaso de")) return "Transferencia in";
+  if (descriptionLower.includes("abono")) return "Transferencia in";
+  if (descriptionLower.includes("giro cajero automatico")) return "Giro";
+  if (descriptionLower.includes("pago:comunidad feliz")) return "Gastos Comunes";
+  if (descriptionLower.includes("pago tarjeta de credito")) return "Pago TC";
+  if (descriptionLower.includes("cargo por pago tc")) return "Pago TC";
+  if (descriptionLower.includes("pago:")) return "Pago";
+  if (descriptionLower.includes("comision admin. mensual plan cuent")) return "Comisión";
+  if (descriptionLower.includes("intereses linea de credito")) return "Intereses LC";
+  if (descriptionLower.includes("impuesto linea de credito")) return "Intereses LC";
+  if (descriptionLower.includes("prima seguro desgravamen")) return "Seguro";
+  if (descriptionLower.includes("transferencia desde linea de credi")) return "Pago LC in";
+  if (descriptionLower.includes("pago linea de cred")) return "Pago LC out";
+  if (descriptionLower.includes("pago en servipag.com")) return "Cuentas";
+  if (descriptionLower.includes("regularizacion de seguro")) return "Regularización de seguro";
+  if (descriptionLower.includes("saldo")) return "Saldo";
+  return "";
+}
+

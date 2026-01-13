@@ -1,0 +1,30 @@
+{
+  "timeZone": "America/Santiago",
+  "exceptionLogging": "STACKDRIVER",
+  "runtimeVersion": "V8",
+  "dependencies": {
+    "enabledAdvancedServices": [
+      {
+        "userSymbol": "Drive",
+        "serviceId": "drive",
+        "version": "v2"
+      },
+      {
+        "userSymbol": "DriveActivity",
+        "version": "v2",
+        "serviceId": "driveactivity"
+      }
+    ],
+    "libraries": [
+      {
+        "userSymbol": "Finanzas_v2",
+        "version": "0",
+        "libraryId": "1vPt5zvstmIMg7qnU5NmRSAQ0kBv4yVSwu_FL4cPVONSk_F9dQ6Y99GJV",
+        "developmentMode": true
+      }
+    ]
+  },
+  "executionApi": {
+    "access": "ANYONE"
+  }
+}
