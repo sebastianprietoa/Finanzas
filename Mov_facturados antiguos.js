@@ -1,5 +1,5 @@
 function processAllOldInvoices() {
-  const ui = SpreadsheetApp.getUi();
+  const ui = getUiOrNull_();
   
   // Mostrar un mensaje de "Cargando" al usuario utilizando el archivo HTML
   const htmlOutput = HtmlService.createHtmlOutputFromFile('Cargando')
@@ -7,7 +7,7 @@ function processAllOldInvoices() {
     .setHeight(100);
   
   // Mostrar la ventana de "Cargando"
-  ui.showModalDialog(htmlOutput, 'Por favor espere');
+  if (ui) ui.showModalDialog(htmlOutput, 'Por favor espere');
 
   try {
     // ID de la carpeta que contiene los archivos de facturación antiguos
@@ -108,12 +108,11 @@ function processAllOldInvoices() {
     Logger.log('Todos los movimientos facturados antiguos procesados correctamente.');
     
   } catch (e) {
-    ui.alert('Error durante la ejecución: ' + e.message);
+    if (ui) ui.alert('Error durante la ejecución: ' + e.message);
+    Logger.log('Error durante processAllOldInvoices: ' + e.message);
   } finally {
     // Cerrar el mensaje de "Cargando" al terminar
-    const closeDialogScript = '<script>google.script.host.close();</script>';
-    const closeDialogOutput = HtmlService.createHtmlOutput(closeDialogScript);
-    SpreadsheetApp.getUi().showModalDialog(closeDialogOutput, 'Cerrando');
+    closeLoadingDialog(ui);
   }
 }
 function classifyDescription(description) {
