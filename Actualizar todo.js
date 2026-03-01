@@ -246,7 +246,7 @@ function reclassifyDescriptions() {
   // Recorrer cada descripción y reclasificar
   for (let i = 0; i < descriptions.length; i++) {
     const description = descriptions[i][0];
-    const newClassification = classifyDescription(description);
+    const newClassification = classifyCardDescription_(description);
     newClassifications.push([newClassification]);
   }
 
@@ -254,37 +254,4 @@ function reclassifyDescriptions() {
   classificationRange.setValues(newClassifications);
 
   Logger.log('Reclasificación completada.');
-}
-
-function classifyDescription(description) {
-  description = description.toLowerCase(); // Convertir a minúsculas para facilitar la comparación
-
-  if (description.includes("uber") || description.includes("didi")) {
-    return "Transporte";
-  }
-  if (description.includes("sta isabel") || description.includes("olivo market") || description.includes("merk2 express") || description.includes("unimarc") || description.includes("tottus") || description.includes("er ferias") || description.includes("chavreys market") || description.includes("minimarket") || description.includes("botilleria")) {
-    return "Supermercados y Tiendas de Comestibles";
-  }
-  if (description.includes("cafeteria") || description.includes("galpon italia") || description.includes("san camilo") || description.includes("la cosecha") || description.includes("ok market") || description.includes("la pica del cronica") || description.includes("krossbar")) {
-    return "Comida y Bebida";
-  }
-  if (description.includes("google play") || description.includes("cinepolis") || description.includes("ticketmaster")) {
-    return "Entretenimiento y Ocio";
-  }
-  if (description.includes("merpago") || description.includes("mercadopago") || description.includes("mercado lib")) {
-    return "Compras en Línea";
-  }
-  if (description.includes("instituto psiquiat")) {
-    return "Salud";
-  }
-  if (description.includes("gimnasios chile")) {
-    return "Gimnasios y Deporte";
-  }
-  if (description.includes("impuesto") || description.includes("comision mensual") || description.includes("intereses rotativos") || description.includes("traspaso deuda")) {
-    return "Impuestos y Comisiones";
-  }
-  if (description.includes("la polar") || description.includes("falabella") || description.includes("saxol mall vivo") || description.includes("easy internet")) {
-    return "Retail";
-  }
-  return "Otros"; // Clasificación por defecto si no encaja en ninguna otra
 }
