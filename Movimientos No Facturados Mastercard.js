@@ -1,11 +1,11 @@
 function processNoFacturadosMastercard() {
-  const ui = SpreadsheetApp.getUi();
+  const ui = getUiOrNull_();
   
   // Mostrar un mensaje de "Cargando"
   const htmlOutput = HtmlService.createHtmlOutputFromFile('Cargando')
     .setWidth(200)
     .setHeight(100);
-  ui.showModalDialog(htmlOutput, 'Por favor espere');
+  if (ui) ui.showModalDialog(htmlOutput, 'Por favor espere');
 
   try {
     const folder = DriveApp.getFolderById(CONFIG.UNBILLED_MOVEMENTS_FOLDER_ID);
@@ -77,10 +77,9 @@ function processNoFacturadosMastercard() {
     Logger.log('Movimientos no facturados procesados correctamente.');
 
   } catch (e) {
-    ui.alert('Error durante la ejecución: ' + e.message);
+    if (ui) ui.alert('Error durante la ejecución: ' + e.message);
+    Logger.log('Error durante processNoFacturadosMastercard: ' + e.message);
   } finally {
-    const closeDialogScript = '<script>google.script.host.close();</script>';
-    const closeDialogOutput = HtmlService.createHtmlOutput(closeDialogScript);
-    SpreadsheetApp.getUi().showModalDialog(closeDialogOutput, 'Cerrando');
+    closeLoadingDialog(ui);
   }
 }

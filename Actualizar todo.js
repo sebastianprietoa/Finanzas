@@ -1,7 +1,9 @@
 function runAllProcesses() {
   const ui = getUiOrNull_();
+  const startTime = new Date();
 
   try {
+    logProcessProgress_('Iniciando runAllProcesses');
     const folderId = getFolderIdByFileName("Finanzas 2");  // Obtener el folderId usando la nueva función
 
     if (!folderId) {
@@ -9,6 +11,8 @@ function runAllProcesses() {
       Logger.log('No se encontró la carpeta que contiene el archivo "Finanzas 2".');
       return;
     }
+
+    logProcessProgress_('Folder ID detectado', { folderId: folderId });
 
     // Mostrar un mensaje de "Cargando" al usuario utilizando el archivo HTML
     if (ui) {
@@ -21,26 +25,85 @@ function runAllProcesses() {
     }
     
     // Ejecutar las funciones necesarias
-    convertExcelToGoogleSheets(folderId);
-    extractAndCopyCartolasFromGoogleSheets();
-    processCurrentCartola_FROM_FOLDER();      // Procesar cartola actual
-    processMovFacturadosVisa();
-    processMovFacturadosMastercard();       // Procesar movimientos facturados
-    processNoFacturadosVisa();        // Procesar movimientos no facturados Visa
-    processNoFacturadosMastercard();        // Procesar movimientos no facturados Mastercard
-    processAllOldInvoices();      // Procesar facturaciones antiguas
+    runProcessStep_('convertExcelToGoogleSheets', function() {
+      convertExcelToGoogleSheets(folderId);
+    });
+    runProcessStep_('extractAndCopyCartolasFromGoogleSheets', function() {
+      extractAndCopyCartolasFromGoogleSheets();
+    });
+    runProcessStep_('processCurrentCartola_FROM_FOLDER', function() {
+      processCurrentCartola_FROM_FOLDER();      // Procesar cartola actual
+    });
+    runProcessStep_('processMovFacturadosVisa', function() {
+      processMovFacturadosVisa();
+    });
+    runProcessStep_('processMovFacturadosMastercard', function() {
+      processMovFacturadosMastercard();       // Procesar movimientos facturados
+    });
+    runProcessStep_('processNoFacturadosVisa', function() {
+      processNoFacturadosVisa();        // Procesar movimientos no facturados Visa
+    });
+    runProcessStep_('processNoFacturadosMastercard', function() {
+      processNoFacturadosMastercard();        // Procesar movimientos no facturados Mastercard
+    });
+    runProcessStep_('processAllOldInvoices', function() {
+      processAllOldInvoices();      // Procesar facturaciones antiguas
+    });
 
     // Mostrar mensaje de éxito cuando termine la ejecución
     if (ui) ui.alert('Procesos completados con éxito.');
+    const totalSeconds = secondsSince_(startTime);
+    logProcessProgress_('runAllProcesses completado', { duration_s: totalSeconds });
     Logger.log('Procesos completados con éxito.');
   } catch (e) {
     // Si ocurre un error, mostrar una alerta con el mensaje de error
+    const totalSeconds = secondsSince_(startTime);
+    logProcessProgress_('Error en runAllProcesses', {
+      duration_s: totalSeconds,
+      message: e.message,
+      stack: e.stack || 'sin stack'
+    });
     if (ui) ui.alert('Error durante la ejecución: ' + e.message);
     Logger.log('Error durante la ejecución: ' + e.message);
   } finally {
     // Cerrar la ventana de "Cargando" al finalizar la ejecución
     closeLoadingDialog(ui);
   }
+}
+
+function runProcessStep_(stepName, fn) {
+  const startedAt = new Date();
+  logProcessProgress_('Iniciando paso', { step: stepName });
+
+  try {
+    fn();
+    logProcessProgress_('Paso completado', {
+      step: stepName,
+      duration_s: secondsSince_(startedAt)
+    });
+  } catch (e) {
+    logProcessProgress_('Paso con error', {
+      step: stepName,
+      duration_s: secondsSince_(startedAt),
+      message: e.message,
+      stack: e.stack || 'sin stack'
+    });
+    throw e;
+  }
+}
+
+function secondsSince_(date) {
+  return Math.round(((new Date()).getTime() - date.getTime()) / 1000);
+}
+
+function logProcessProgress_(message, payload) {
+  const timestamp = (new Date()).toISOString();
+  if (!payload) {
+    Logger.log('[runAllProcesses][' + timestamp + '] ' + message);
+    return;
+  }
+
+  Logger.log('[runAllProcesses][' + timestamp + '] ' + message + ' | ' + JSON.stringify(payload));
 }
 
 function getFolderIdByFileName(fileName) {
@@ -183,7 +246,7 @@ function reclassifyDescriptions() {
   // Recorrer cada descripción y reclasificar
   for (let i = 0; i < descriptions.length; i++) {
     const description = descriptions[i][0];
-    const newClassification = classifyDescription(description);
+    const newClassification = classifyCardDescription_(description);
     newClassifications.push([newClassification]);
   }
 
@@ -191,37 +254,4 @@ function reclassifyDescriptions() {
   classificationRange.setValues(newClassifications);
 
   Logger.log('Reclasificación completada.');
-}
-
-function classifyDescription(description) {
-  description = description.toLowerCase(); // Convertir a minúsculas para facilitar la comparación
-
-  if (description.includes("uber") || description.includes("didi")) {
-    return "Transporte";
-  }
-  if (description.includes("sta isabel") || description.includes("olivo market") || description.includes("merk2 express") || description.includes("unimarc") || description.includes("tottus") || description.includes("er ferias") || description.includes("chavreys market") || description.includes("minimarket") || description.includes("botilleria")) {
-    return "Supermercados y Tiendas de Comestibles";
-  }
-  if (description.includes("cafeteria") || description.includes("galpon italia") || description.includes("san camilo") || description.includes("la cosecha") || description.includes("ok market") || description.includes("la pica del cronica") || description.includes("krossbar")) {
-    return "Comida y Bebida";
-  }
-  if (description.includes("google play") || description.includes("cinepolis") || description.includes("ticketmaster")) {
-    return "Entretenimiento y Ocio";
-  }
-  if (description.includes("merpago") || description.includes("mercadopago") || description.includes("mercado lib")) {
-    return "Compras en Línea";
-  }
-  if (description.includes("instituto psiquiat")) {
-    return "Salud";
-  }
-  if (description.includes("gimnasios chile")) {
-    return "Gimnasios y Deporte";
-  }
-  if (description.includes("impuesto") || description.includes("comision mensual") || description.includes("intereses rotativos") || description.includes("traspaso deuda")) {
-    return "Impuestos y Comisiones";
-  }
-  if (description.includes("la polar") || description.includes("falabella") || description.includes("saxol mall vivo") || description.includes("easy internet")) {
-    return "Retail";
-  }
-  return "Otros"; // Clasificación por defecto si no encaja en ninguna otra
 }
