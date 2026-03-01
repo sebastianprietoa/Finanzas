@@ -1,7 +1,9 @@
 function runAllProcesses() {
   const ui = getUiOrNull_();
+  const startTime = new Date();
 
   try {
+    logProcessProgress_('Iniciando runAllProcesses');
     const folderId = getFolderIdByFileName("Finanzas 2");  // Obtener el folderId usando la nueva función
 
     if (!folderId) {
@@ -9,6 +11,8 @@ function runAllProcesses() {
       Logger.log('No se encontró la carpeta que contiene el archivo "Finanzas 2".');
       return;
     }
+
+    logProcessProgress_('Folder ID detectado', { folderId: folderId });
 
     // Mostrar un mensaje de "Cargando" al usuario utilizando el archivo HTML
     if (ui) {
@@ -21,26 +25,85 @@ function runAllProcesses() {
     }
     
     // Ejecutar las funciones necesarias
-    convertExcelToGoogleSheets(folderId);
-    extractAndCopyCartolasFromGoogleSheets();
-    processCurrentCartola_FROM_FOLDER();      // Procesar cartola actual
-    processMovFacturadosVisa();
-    processMovFacturadosMastercard();       // Procesar movimientos facturados
-    processNoFacturadosVisa();        // Procesar movimientos no facturados Visa
-    processNoFacturadosMastercard();        // Procesar movimientos no facturados Mastercard
-    processAllOldInvoices();      // Procesar facturaciones antiguas
+    runProcessStep_('convertExcelToGoogleSheets', function() {
+      convertExcelToGoogleSheets(folderId);
+    });
+    runProcessStep_('extractAndCopyCartolasFromGoogleSheets', function() {
+      extractAndCopyCartolasFromGoogleSheets();
+    });
+    runProcessStep_('processCurrentCartola_FROM_FOLDER', function() {
+      processCurrentCartola_FROM_FOLDER();      // Procesar cartola actual
+    });
+    runProcessStep_('processMovFacturadosVisa', function() {
+      processMovFacturadosVisa();
+    });
+    runProcessStep_('processMovFacturadosMastercard', function() {
+      processMovFacturadosMastercard();       // Procesar movimientos facturados
+    });
+    runProcessStep_('processNoFacturadosVisa', function() {
+      processNoFacturadosVisa();        // Procesar movimientos no facturados Visa
+    });
+    runProcessStep_('processNoFacturadosMastercard', function() {
+      processNoFacturadosMastercard();        // Procesar movimientos no facturados Mastercard
+    });
+    runProcessStep_('processAllOldInvoices', function() {
+      processAllOldInvoices();      // Procesar facturaciones antiguas
+    });
 
     // Mostrar mensaje de éxito cuando termine la ejecución
     if (ui) ui.alert('Procesos completados con éxito.');
+    const totalSeconds = secondsSince_(startTime);
+    logProcessProgress_('runAllProcesses completado', { duration_s: totalSeconds });
     Logger.log('Procesos completados con éxito.');
   } catch (e) {
     // Si ocurre un error, mostrar una alerta con el mensaje de error
+    const totalSeconds = secondsSince_(startTime);
+    logProcessProgress_('Error en runAllProcesses', {
+      duration_s: totalSeconds,
+      message: e.message,
+      stack: e.stack || 'sin stack'
+    });
     if (ui) ui.alert('Error durante la ejecución: ' + e.message);
     Logger.log('Error durante la ejecución: ' + e.message);
   } finally {
     // Cerrar la ventana de "Cargando" al finalizar la ejecución
     closeLoadingDialog(ui);
   }
+}
+
+function runProcessStep_(stepName, fn) {
+  const startedAt = new Date();
+  logProcessProgress_('Iniciando paso', { step: stepName });
+
+  try {
+    fn();
+    logProcessProgress_('Paso completado', {
+      step: stepName,
+      duration_s: secondsSince_(startedAt)
+    });
+  } catch (e) {
+    logProcessProgress_('Paso con error', {
+      step: stepName,
+      duration_s: secondsSince_(startedAt),
+      message: e.message,
+      stack: e.stack || 'sin stack'
+    });
+    throw e;
+  }
+}
+
+function secondsSince_(date) {
+  return Math.round(((new Date()).getTime() - date.getTime()) / 1000);
+}
+
+function logProcessProgress_(message, payload) {
+  const timestamp = (new Date()).toISOString();
+  if (!payload) {
+    Logger.log('[runAllProcesses][' + timestamp + '] ' + message);
+    return;
+  }
+
+  Logger.log('[runAllProcesses][' + timestamp + '] ' + message + ' | ' + JSON.stringify(payload));
 }
 
 function getFolderIdByFileName(fileName) {
