@@ -1,4 +1,6 @@
 function classifyCC_(descriptionLower) {
+  if (descriptionLower.includes("traspaso a:carlos prieto")) return "Familia";
+  if (descriptionLower.includes("traspaso a:esther aguirre")) return "Familia";
   if (descriptionLower.includes("traspaso a:gonzalo sanchez escoba")) return "Arriendo";
   if (descriptionLower.includes("traspaso a:fintual administradora")) return "Fintech";
   if (descriptionLower.includes("traspaso a:soyfocus administradora")) return "Fintech";
@@ -15,7 +17,8 @@ function classifyCC_(descriptionLower) {
   if (descriptionLower.includes("pago prestamo")) return "Pago préstamo";
   if (descriptionLower.includes("pago:")) return "Pago";
   if (descriptionLower.includes("abono por recaudacion servicios")) return "Abono servicios";
-  if (descriptionLower.includes("abonos por creditos m/n")) return "Abono créditos";
+  if (descriptionLower.includes("abonos por creditos m/n")) return "Pago préstamo";
+  if (descriptionLower.includes("pago de creditos m/n")) return "Pago préstamo";
   if (descriptionLower.includes("comision admin. mensual plan cuent")) return "Comisión";
   if (descriptionLower.includes("comision compras en el exterior")) return "Comisión exterior";
   if (descriptionLower.includes("intereses linea de credito")) return "Intereses LC";
